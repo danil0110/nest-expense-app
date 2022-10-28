@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseEnumPipe,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -17,49 +19,43 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getAllReports(@Param('type') type: string) {
-    const reportType =
-      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-    return this.appService.getAllReports(reportType);
+  getAllReports(
+    @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
+  ) {
+    return this.appService.getAllReports(type);
   }
 
   @Get(':id')
-  getReportById(@Param('type') type: string, @Param('id') id: string) {
-    const reportType =
-      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-
-    return this.appService.getReportById(reportType, id);
+  getReportById(
+    @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.appService.getReportById(type, id);
   }
 
   @Post()
   createReport(
     @Body() body: { source: string; amount: number },
-    @Param('type') type: string,
+    @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
   ) {
-    const reportType =
-      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-
-    return this.appService.createReport(reportType, body);
+    return this.appService.createReport(type, body);
   }
 
   @Put(':id')
   updateReport(
-    @Param('type') type: string,
+    @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
     @Param('id') id: string,
     @Body() body: { source: string; amount: number },
   ) {
-    const reportType =
-      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-
-    return this.appService.updateReport(reportType, id, body);
+    return this.appService.updateReport(type, id, body);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  deleteReport(@Param('type') type: string, @Param('id') id: string) {
-    const reportType =
-      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-
-    return this.appService.deleteReport(reportType, id);
+  deleteReport(
+    @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
+    @Param('id') id: string,
+  ) {
+    return this.appService.deleteReport(type, id);
   }
 }
