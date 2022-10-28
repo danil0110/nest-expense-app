@@ -13,7 +13,11 @@ import {
 import { AppService } from './app.service';
 
 import { ReportType } from './data';
-import { CreateReportDto, UpdateReportDto } from './dtos/report.dto';
+import {
+  CreateReportDto,
+  ReportResponseDto,
+  UpdateReportDto,
+} from './dtos/report.dto';
 
 @Controller('report/:type')
 export class AppController {
@@ -22,7 +26,7 @@ export class AppController {
   @Get()
   getAllReports(
     @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
-  ) {
+  ): ReportResponseDto[] {
     return this.appService.getAllReports(type);
   }
 
@@ -30,7 +34,7 @@ export class AppController {
   getReportById(
     @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
     @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  ): ReportResponseDto {
     return this.appService.getReportById(type, id);
   }
 
@@ -38,7 +42,7 @@ export class AppController {
   createReport(
     @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
     @Body() body: CreateReportDto,
-  ) {
+  ): ReportResponseDto {
     return this.appService.createReport(type, body);
   }
 
@@ -47,7 +51,7 @@ export class AppController {
     @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
     @Param('id') id: string,
     @Body() body: UpdateReportDto,
-  ) {
+  ): ReportResponseDto {
     return this.appService.updateReport(type, id, body);
   }
 
@@ -56,7 +60,7 @@ export class AppController {
   deleteReport(
     @Param('type', new ParseEnumPipe(ReportType)) type: ReportType,
     @Param('id') id: string,
-  ) {
+  ): ReportResponseDto {
     return this.appService.deleteReport(type, id);
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ReportType, data } from './data';
 import { v4 as uuid } from 'uuid';
+import { ReportResponseDto } from './dtos/report.dto';
 
 interface Report {
   source: string;
@@ -9,17 +10,26 @@ interface Report {
 
 @Injectable()
 export class AppService {
-  getAllReports(type: ReportType) {
-    return data.reports.filter((report) => report.type === type);
+  getAllReports(type: ReportType): ReportResponseDto[] {
+    return data.reports
+      .filter((report) => report.type === type)
+      .map((report) => new ReportResponseDto(report));
   }
 
-  getReportById(type: ReportType, id: string) {
-    return data.reports.find(
+  getReportById(type: ReportType, id: string): ReportResponseDto {
+    const report = data.reports.find(
       (report) => report.type === type && report.id === id,
     );
+
+    if (!report) return;
+
+    return new ReportResponseDto(report);
   }
 
-  createReport(type: ReportType, { source, amount }: Report) {
+  createReport(
+    type: ReportType,
+    { source, amount }: Report,
+  ): ReportResponseDto {
     const newReport = {
       id: uuid(),
       source,
@@ -30,10 +40,10 @@ export class AppService {
     };
 
     data.reports.push(newReport);
-    return newReport;
+    return new ReportResponseDto(newReport);
   }
 
-  updateReport(type: ReportType, id: string, body: Report) {
+  updateReport(type: ReportType, id: string, body: Report): ReportResponseDto {
     const reportToUpdateIdx = data.reports.findIndex(
       (r) => r.type === type && r.id === id,
     );
@@ -45,10 +55,10 @@ export class AppService {
       ...body,
     };
 
-    return data.reports[reportToUpdateIdx];
+    return new ReportResponseDto(data.reports[reportToUpdateIdx]);
   }
 
-  deleteReport(type: ReportType, id: string) {
+  deleteReport(type: ReportType, id: string): ReportResponseDto {
     const reportToDelete = data.reports.find(
       (r) => r.type === type && r.id === id,
     );
@@ -57,6 +67,6 @@ export class AppService {
 
     data.reports = data.reports.filter((r) => r.type === type && r.id !== id);
 
-    return reportToDelete;
+    return new ReportResponseDto(reportToDelete);
   }
 }
